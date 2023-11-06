@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "eth_key": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "wallet_provider": {
+      "type": "string",
+      "enum": ["metamask", "gamestop", "other"]
+    },
+    "eth_network": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

@@ -1,0 +1,46 @@
+components:
+  responses:
+    user:
+      description: Successful response
+      content:
+        application/json:
+          example:
+            success: true
+            token: <token>
+            user:
+              id: 1
+              name: John Doe
+              email: example@example.com
+              roles:
+              - USER
+              active: true
+              eth_key: <eth_key>
+              eth_network: <eth_network>
+              wallet_status: CONNECTED
+              wallet_provider: metamask
+    success:
+      description: 'Successful response'
+      content:
+        application/json:
+          example:
+            success: true
+    404:
+      description: 'Not found'
+      content:
+        application/json:
+          example:
+            success: false
+            message: API Doesn't Exist
+    401:
+      description: 'Not authenticated'
+      content:
+        application/json:
+          example:
+            message: 'Please add Authorization!'
+            error: {}
+  securitySchemes:
+    jwt:
+      type: 'http'
+      description: 'JWT Authorization header using the Bearer scheme.'
+      scheme: 'bearer'
+      bearerFormat: 'JWT'

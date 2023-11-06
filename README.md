@@ -1,1 +1,1 @@
-# Blind-Box-Backend-V2
+# Node.js-Sequelize-Template

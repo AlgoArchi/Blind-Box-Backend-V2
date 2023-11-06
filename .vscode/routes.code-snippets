@@ -1,0 +1,51 @@
+{
+  "Create Route file": {
+    "scope": "javascript",
+    "prefix": "routes",
+    "body": [
+      "const $1Ctrls = require('~/controllers/$1.controllers');",
+      "",
+      "/**",
+      " * @type { Routes.default }",
+      " */",
+      "module.exports = {",
+      "\tprefix: '/$1',",
+      "\troutes: [{",
+      "\t\tpath: '/$2',",
+      "\t\tmethods: {",
+      "\t\t\t${3|get,post,put,delete,all|}: {",
+      "\t\t\t\tmiddlewares: [",
+      "\t\t\t\t\t$4",
+      "\t\t\t\t],",
+      "\t\t\t},",
+      "\t\t},",
+      "\t}],",
+      "};",
+      ""
+    ],
+    "description": "Initialize the routes"
+  },
+  "Create route": {
+    "scope": "javascript",
+    "prefix": "routes:add",
+    "body": [
+      "{",
+      "\tpath: '/$1',",
+      "\tmethods: {",
+      "\t\t${2|get,post,put,delete,all|}: {",
+      "\t\t\tmiddlewares: [",
+      "\t\t\t\t$3",
+      "\t\t\t],",
+      "\t\t},",
+      "\t},",
+      "}"
+    ],
+    "description": "Create new route"
+  },
+  "Create method": {
+    "scope": "javascript",
+    "prefix": "routes:method",
+    "body": ["${1|get,post,put,delete,all|}: {", "\tmiddlewares: [", "\t\t$2", "\t],", "},"],
+    "description": "Add method to an existing route"
+  }
+}

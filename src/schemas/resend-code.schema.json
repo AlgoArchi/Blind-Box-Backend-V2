@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email",
+      "errorMessage": {
+        "format": "Invalid Email Address"
+      }
+    },
+    "type": {
+      "type": "string",
+      "enum": ["forgot-password", "validate-email"],
+      "errorMessage": {
+        "enum": "Invalid type. Possible values: 'forgot-password', 'validate-email'"
+      }
+    },
+    "token": {
+      "type": "string"
+    }
+  },
+  "required": ["email", "type"],
+  "additionalProperties": false
+}

@@ -1,0 +1,37 @@
+{
+  "Add swagget documentation": {
+    "scope": "javascript",
+    "prefix": "@swagger",
+    "body": [
+      "/**",
+      " * @openapi",
+      " *  /$1:",
+      " *    ${2|get,post,put,delete|}:",
+      " *      description: ${3:Description of the API}",
+      " *      tags:",
+      " *      - $4",
+      " *      security:",
+      " *      - jwt: []${6:",
+      " *      requestBody:",
+      " *        content:",
+      " *          application/json:",
+      " *            schema:",
+      " *              type: object",
+      " *            example:",
+      " *              ${7:foo: bar}}",
+      " *      responses:",
+      " *        200:",
+      " *          description: ${5:Successful response}",
+      " *          content:",
+      " *            application/json:",
+      " *              example:",
+      " *                success: true",
+      " *        401:",
+      " *          \\$ref: '#/components/responses/401'",
+      " *        404:",
+      " *          \\$ref: '#/components/responses/404'",
+      " */",
+    ],
+    "description": "Add swagger documentation"
+  }
+}

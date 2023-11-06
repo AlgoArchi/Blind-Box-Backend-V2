@@ -1,0 +1,11 @@
+{
+  "files.eol": "\n",
+  "files.exclude": {
+    "db/**": true
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": ["javascript"]
+}
