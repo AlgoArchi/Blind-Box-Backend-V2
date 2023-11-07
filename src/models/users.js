@@ -9,7 +9,7 @@ const getUserModel = (sequelize, { DataTypes }) => {
       },
       wallet_address: {
         type: DataTypes.STRING,
-        unique: true,
+        allowNull: false,
       },
     }, {
     timestamps: true,

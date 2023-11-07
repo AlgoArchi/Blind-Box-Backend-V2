@@ -9,14 +9,13 @@ const { jwt: jwtConfig } = require('~/config/index');
  * @param {object} payload the payload
  * @returns {string} the token
  */
-exports.signToken = async (id, payload = {}, desc = '') => {
+exports.signToken = async (payload = {}, desc = '') => {
   return jwt.sign(
     {
       iss: jwtConfig.iss,
       aud: jwtConfig.aud,
       exp: Math.floor(Date.now() / 1000) + jwtConfig.exp,
       ...payload,
-      sub: id,
     },
     jwtConfig.privateKey,
     {

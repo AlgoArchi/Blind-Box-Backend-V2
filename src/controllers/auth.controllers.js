@@ -1,18 +1,15 @@
-const crypto = require('node:crypto');
-const axios = require('axios').default;
 const log = require('debug')('app:controllers:auth');
 
 const { sendError, signToken, getPublic } = require('~/utils/utils');
 const env = require('~/lib/nunjucks');
-const { User, VerifyCode, Session } = require('~/models/index');
-const { security, publicUrl } = require('~/config/index');
-// const { updatePassword } = require('~/utils/paramlabs');
+const { User } = require('~/models/index');
+const { security } = require('~/config/index');
 const { VERIFY_CODE_TYPES } = require('~/utils/constants');
 const { verify } = require('~/lib/google');
 const { Op } = require('sequelize');
 const isEmpty = require('~/helper/isEmpty');
 const { Web3 } = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider("https://eth-mainnet.g.alchemy.com/v2/Q4zCr5RgApmOMXaW5BxiXqhPIZkv--5K"));
+const web3 = new Web3(new Web3.providers.HttpProvider(process.env.MAIN_PROVIDER));
 
 /**
  * Update current user profile
@@ -39,7 +36,7 @@ exports.connnectWallet = async (req, res) => {
     });
     let token = '';
     if (!isEmpty(existUser)) {
-      token = await signToken(existUser);
+      token = await signToken({ id: existUser.id, wallet_address: existUser.wallet_address.toLowerCase() });
     } else {
       const user = await User.create({ wallet_address: wallet_address.toLowerCase() });
       token = await signToken({ id: user.id, wallet_address: wallet_address.toLowerCase() });

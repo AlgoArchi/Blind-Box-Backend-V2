@@ -1,8 +1,8 @@
 const User = require("./users");
 
-const getWalletModel = (sequelize, { DataTypes }) => {
-  const Wallet = sequelize.define(
-    'wallets',
+const getDepositModel = (sequelize, { DataTypes }) => {
+  const Deposit = sequelize.define(
+    'deposits',
     {
       id: {
         type: DataTypes.INTEGER,
@@ -11,13 +11,16 @@ const getWalletModel = (sequelize, { DataTypes }) => {
       },
       user_id: {
         type: DataTypes.INTEGER,
-        unique: true,
         allowNull: false,
       },
-      balance: {
-        type: DataTypes.FLOAT,
+      transaction_hash: {
+        type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: 0,
+      },
+      status: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 2
       },
     }, {
     timestamps: true,
@@ -25,13 +28,13 @@ const getWalletModel = (sequelize, { DataTypes }) => {
     updatedAt: 'updateTimestamp'
   });
 
-  Wallet.associate = () => {
-    Wallet.belongsTo(User, {
+  Deposit.associate = () => {
+    Deposit.belongsTo(User, {
       foreignKey: 'user_id',
     });
   };
 
-  return Wallet;
+  return Deposit;
 };
 
-module.exports = getWalletModel;
+module.exports = getDepositModel;

@@ -5,8 +5,6 @@ const cors = require('cors');
 const morgan = require('morgan');
 const multer = require('multer');
 const log = require('debug')('app:main');
-const xss = require('xss-clean');
-const mongoSanitize = require('express-mongo-sanitize');
 
 const { sequelize } = require('~/models/index');
 const routes = require('~/routes/index');
@@ -36,8 +34,6 @@ exports.start = async () => {
   log('configure body parsers');
   app.use(express.json({ limit: '10kb' }));
   app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-  // Data sanitization against NOSQL query injection and xss
-  app.use(mongoSanitize(), xss());
 
   log('configure static files');
   app.use('/images', express.static(`${__dirname}/uploads`));

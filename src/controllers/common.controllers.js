@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const { sendError } = require('~/utils/utils');
-const { User, Session } = require('~/models/index');
+const { User } = require('~/models/index');
 const { jwt: jwtConfig } = require('~/config/index');
 
 /**
@@ -39,25 +39,19 @@ exports.loadUser = async function loadUser(req, res, next) {
       issuer: jwtConfig.iss,
     });
   } catch (e) {
+    console.log("e ", e)
     return sendError(req, res, 401, 'Invalid access token');
   }
 
-  const session = await Session.findByPk(decrypted.jti);
-
-  if (!session || session.user_id !== decrypted.sub)
-    return sendError(req, res, 401, 'Invalid access token');
-
-  const user = await User.scope('withPassword').findOne({
+  const user = await User.findOne({
     where: {
-      id: decrypted.sub,
-      active: true,
+      id: decrypted.id,
     },
   });
 
   if (!user) return sendError(req, res, 401, 'Invalid access token');
 
   req.user = user;
-  req.session = session;
   return next();
 };
 
