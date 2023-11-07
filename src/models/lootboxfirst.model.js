@@ -1,7 +1,14 @@
 const getLootBoxFirst = (sequelize, { DataTypes }) => {
   const LootBoxFirst = sequelize.define('lootboxfirsts', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     rewards: { type: DataTypes.FLOAT },
     xbuff_points: { type: DataTypes.FLOAT },
+  }, {
+    timestamps: true,
     createdAt: true,
     updatedAt: 'updateTimestamp'
   });

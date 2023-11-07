@@ -2,8 +2,6 @@ const authCtrls = require('~/controllers/auth.controllers');
 const commonCtrls = require('~/controllers/common.controllers');
 const { validate } = require('~/lib/ajv');
 
-const schemas = require('~/schemas/index');
-
 /**
  * @type { Routes.default }
  */
@@ -59,7 +57,6 @@ module.exports = {
         post: {
           middlewares: [
             commonCtrls.isAuthenticated,
-            validate(schemas.editProfile),
             authCtrls.editProfile,
           ],
         },

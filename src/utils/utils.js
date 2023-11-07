@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const { pick } = require('lodash');
 const { promisify } = require('node:util');
 const { jwt: jwtConfig } = require('~/config/index');
-const { Session } = require('~/models/index');
 
 /**
  * Create signed token
@@ -11,10 +10,6 @@ const { Session } = require('~/models/index');
  * @returns {string} the token
  */
 exports.signToken = async (id, payload = {}, desc = '') => {
-  const session = await Session.create({
-    user_id: id,
-    desc,
-  });
   return jwt.sign(
     {
       iss: jwtConfig.iss,
@@ -22,7 +17,6 @@ exports.signToken = async (id, payload = {}, desc = '') => {
       exp: Math.floor(Date.now() / 1000) + jwtConfig.exp,
       ...payload,
       sub: id,
-      jti: session.id,
     },
     jwtConfig.privateKey,
     {
