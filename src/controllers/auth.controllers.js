@@ -20,11 +20,14 @@ const web3 = new Web3(new Web3.providers.HttpProvider(process.env.MAIN_PROVIDER)
 
 exports.connnectWallet = async (req, res) => {
   const { wallet_address, signed_message, signature } = req.body;
+  console.log("wallet_address", wallet_address, "signed_message", signed_message, "signature", signature);
   if (isEmpty(wallet_address) || isEmpty(signed_message) || isEmpty(signature)) {
     return res.status(400).json({ success: false, message: "Invalid Request!" });
   }
+  console.log("2");
 
   const actualAddress = await web3.eth.accounts.recover(signed_message, signature);
+  console.log("Actual Address", actualAddress)
   if (actualAddress != wallet_address) {
     return res.status(400).json({ success: false, message: "Invalid wallet address!" });
   }

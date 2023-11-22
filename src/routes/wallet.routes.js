@@ -23,5 +23,13 @@ module.exports = {
         },
       },
     },
+    {
+      path: '/withdraw',
+      methods: {
+        post: {
+          middlewares: [commonCtrls.isAuthenticated, walletController.withdraw],
+        },
+      },
+    },
   ],
 };

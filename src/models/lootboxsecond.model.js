@@ -6,7 +6,10 @@ const getLootBoxSecond = (sequelize, { DataTypes }) => {
       autoIncrement: true,
     },
     rewards: { type: DataTypes.FLOAT },
-    xbuff_points: { type: DataTypes.FLOAT },
+    xbuff_points: {
+      type: DataTypes.FLOAT,
+      defaultValue: 0,
+    },
   }, {
     timestamps: true,
     createdAt: true,

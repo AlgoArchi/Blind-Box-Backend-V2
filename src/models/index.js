@@ -8,6 +8,10 @@ const getLootBoxSecond = require('./lootboxsecond.model');
 const getWalletModel = require('./wallets');
 const getDepositModel = require('./deposits');
 const getTransactionModel = require('./transactions');
+const getWithdrawModel = require('./withdraws');
+const getRoundModel = require('./rounds');
+const getBettingModel = require('./bettings');
+const getAdminModel = require('./admins');
 
 const sequelize = new Sequelize(mysql.db, mysql.username, mysql.password, mysql.options);
 
@@ -18,13 +22,10 @@ const models = {
   Wallet: getWalletModel(sequelize, Sequelize),
   Deposit: getDepositModel(sequelize, Sequelize),
   Transaction: getTransactionModel(sequelize, Sequelize),
+  Withdraw: getWithdrawModel(sequelize, Sequelize),
+  Round: getRoundModel(sequelize, Sequelize),
+  Betting: getBettingModel(sequelize, Sequelize),
+  Admin: getAdminModel(sequelize, Sequelize)
 };
 
-const globalSync = async () => {
-  console.log("calling sync ")
-  await sequelize.sync({ alter: true });
-  console.log("All models were synchronized successfully.");
-}
-
-globalSync();
 module.exports = { sequelize, ...models };

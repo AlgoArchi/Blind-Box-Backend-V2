@@ -1,3 +1,4 @@
+const { isAuthenticated } = require('~/controllers/common.controllers');
 const lootboxController = require('~/controllers/lootbox.controller');
 
 /**
@@ -26,7 +27,7 @@ module.exports = {
       path: '/play',
       methods: {
         post: {
-          middlewares: [lootboxController.playGame],
+          middlewares: [isAuthenticated, lootboxController.playGame],
         },
       },
     },

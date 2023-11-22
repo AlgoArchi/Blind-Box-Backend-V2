@@ -11,7 +11,6 @@ const getWalletModel = (sequelize, { DataTypes }) => {
       },
       user_id: {
         type: DataTypes.INTEGER,
-        unique: true,
         allowNull: false,
       },
       balance: {
@@ -19,6 +18,10 @@ const getWalletModel = (sequelize, { DataTypes }) => {
         allowNull: false,
         defaultValue: 0,
       },
+      xbuff_points: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0,
+      }
     }, {
     timestamps: true,
     createdAt: true,
