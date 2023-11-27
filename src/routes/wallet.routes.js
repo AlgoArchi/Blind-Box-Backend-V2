@@ -19,7 +19,7 @@ module.exports = {
       path: '/deposit',
       methods: {
         post: {
-          middlewares: [commonCtrls.isAuthenticated, walletController.deposit],
+          middlewares: [commonCtrls.isAuthenticated, commonCtrls.isValidTransactionHash, walletController.deposit],
         },
       },
     },

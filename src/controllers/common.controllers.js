@@ -93,3 +93,30 @@ exports.isAuthenticated = async function isAuthenticated(req, res, next) {
 
   return next();
 };
+
+module.exports.isValidTransactionHash = async (req, res, next) => {
+  const { transaction_hash } = req.body;
+  // Check if the transaction hash is a non-empty string
+  if (typeof transaction_hash !== 'string' || !transaction_hash) {
+    return sendError(req, res, 400, 'Invalid Transaction Hash');
+  }
+
+  // Check if the transaction hash starts with "0x"
+  if (!transaction_hash.startsWith("0x")) {
+    return sendError(req, res, 400, 'Invalid Transaction Hash');
+  }
+
+  // Check if the remaining part of the transaction hash is a hexadecimal string
+  const isValidHex = /^[0-9a-fA-F]+$/.test(transaction_hash.slice(2));
+  if (!isValidHex) {
+    return sendError(req, res, 400, 'Invalid Transaction Hash');
+  }
+
+  // Check if the length of the transaction hash is 66 characters
+  if (transaction_hash.length !== 66) {
+    return sendError(req, res, 400, 'Invalid Transaction Hash');
+  }
+
+  // If all checks pass, the transaction hash is considered valid
+  return next();
+}

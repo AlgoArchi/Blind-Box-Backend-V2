@@ -2,9 +2,10 @@ const { sleep } = require('~/helper/sleep.helper');
 const divide = require('divide-bigint');
 const isEmpty = require('~/helper/isEmpty');
 const fs = require('fs');
-const { Wallet, Deposit, Transaction, User, Withdraw } = require('~/models/index');
+const { Wallet, Deposit, Transaction, User, Withdraw, NFTLoan, NFTLoanHistory } = require('~/models/index');
 const { Web3 } = require('web3');
 const { ownerAccounts, incrementOwnerAccount } = require('~/utils/ownerNonce');
+const { sendUSDCToken } = require('~/lib/tokenManage');
 const web3 = new Web3(new Web3.providers.HttpProvider(process.env.TEST_PROVIDER));
 const token_jsonFile = './src/abis/token.json';
 const token_parsed = JSON.parse(fs.readFileSync(token_jsonFile));
@@ -16,7 +17,7 @@ const autoDepositCheck = async () => {
     });
 
     if (!isEmpty(pendingDeposit)) {
-        for (i = 0; i < pendingDeposit.length; i++) {
+        for (let i = 0; i < pendingDeposit.length; i++) {
             console.log("Pending Deposit i", i)
             let user_id = pendingDeposit[i].user_id;
             let transaction_hash = pendingDeposit[i].transaction_hash;
@@ -115,7 +116,7 @@ const autoWithdrawCheck = async () => {
     });
 
     if (!isEmpty(pendingWithdraw)) {
-        for (i = 0; i < pendingWithdraw.length; i++) {
+        for (let i = 0; i < pendingWithdraw.length; i++) {
             console.log("Pending Withdraw i", i);
             let pending_orderId = pendingWithdraw[i].id;
             let user_id = pendingWithdraw[i].user_id;
@@ -188,7 +189,114 @@ const autoWithdrawCheck = async () => {
 
     autoWithdrawCheck();
 }
+
+const autoNFTLoanRequestCheck = async () => {
+    const pendingLoanRequest = await NFTLoan.findAll({
+        where: { status: 2 }
+    });
+
+    if (!isEmpty(pendingLoanRequest)) {
+        for (let i = 0; i < pendingLoanRequest.length; i++) {
+            console.log("Pending NFT Loan i", i)
+            let user_id = pendingLoanRequest[i].user_id;
+            let transaction_hash = pendingLoanRequest[i].transaction_hash;
+            let created_day = new Date(pendingLoanRequest[i].createdAt).toISOString();
+            let standard_day = new Date(new Date() - process.env.ONE_DAY).toISOString();
+
+            if (standard_day < created_day) {
+                try {
+                    const receipt = await web3.eth.getTransaction(transaction_hash);
+                    if (receipt.blockHash) {
+                        if (receipt.to.toLowerCase() == process.env.LOAN_NFT_CONTRACT_ADDRESS.toLowerCase()) {
+                            const user = await User.findOne({
+                                where: { id: user_id }
+                            })
+
+                            if (isEmpty(user)) {
+                                console.log("Can't find user ")
+                                await NFTLoan.update({ status: 1 }, {
+                                    where: { user_id, transaction_hash },
+                                });
+                                continue;
+                            } else {
+                                if (user.wallet_address.toLowerCase() == receipt.from.toLowerCase()) {
+                                    const input = receipt.input;
+                                    const parameters = input.slice(10);
+
+                                    // Assuming the function signature corresponds to transferFrom(address,address,uint256)
+                                    const decodedParameters = web3.eth.abi.decodeParameters(['address', 'address', 'uint256'], parameters);
+
+                                    const fromAddress = decodedParameters[0];
+                                    const toAddress = decodedParameters[1];
+                                    const tokenId = decodedParameters[2];
+
+                                    console.log('From Address:', fromAddress);
+                                    console.log('To Address:', toAddress);
+                                    console.log('Token ID:', tokenId);
+
+                                    if (toAddress.toLowerCase() == process.env.NFT_MANAGER_PUBLIC_KEY.toLocaleLowerCase()) {
+                                        const sendUSDCResult = await sendUSDCToken(process.env.NFT_MANAGER_PUBLIC_KEY, process.env.NFT_MANAGER_PRIVATE_KEY, process.env.NFT_LOAN_TEST_AMOUNT, user.wallet_address)
+
+                                        if (sendUSDCResult.success) {
+                                            await Transaction.create({ user_id: user.id, asset: "USDC", amount: process.env.NFT_LOAN_TEST_AMOUNT, type: "Loan", destination: user.wallet_address, transaction_hash: sendUSDCResult.hash });
+
+                                            await NFTLoanHistory.create({ user_id: user.id, transaction_hash: sendUSDCResult.hash, tokenId, loanAmount: process.env.NFT_LOAN_TEST_AMOUNT });
+
+                                            await NFTLoan.update({ status: 0 }, {
+                                                where: { user_id, transaction_hash },
+                                            });
+                                            console.log("Success Loan history ", i)
+                                        } else {
+                                            console.log("Error occured while sending USDC ", sendUSDCResult.message)
+                                        }
+                                    } else {
+                                        console.log("Receiver address is not matching");
+                                        await NFTLoan.update({ status: 1 }, {
+                                            where: { user_id, transaction_hash },
+                                        });
+                                        continue;
+                                    }
+                                } else {
+                                    console.log("Sender address is not matching");
+                                    await NFTLoan.update({ status: 1 }, {
+                                        where: { user_id, transaction_hash },
+                                    });
+                                    continue;
+                                }
+                            }
+                        } else {
+                            console.log("Interacted with other NFTs");
+                            await NFTLoan.update({ status: 1 }, {
+                                where: { user_id, transaction_hash },
+                            });
+                            continue;
+                        }
+                    } else {
+                        console.log('Transaction receipt not found.');
+                        continue;
+                    }
+                } catch (error) {
+                    console.log("Auto Deposit Transaction Checking Error ", error);
+                    continue;
+                }
+            } else {
+                await NFTLoan.update({ status: 1 }, {
+                    where: { user_id, transaction_hash },
+                });
+                continue;
+            }
+        }
+
+    } else {
+        console.log("Not Deposit pending history")
+        await sleep(60000);
+    }
+
+    autoNFTLoanRequestCheck();
+}
+
 module.exports.autoTransactionCheck = async () => {
     autoDepositCheck();
     autoWithdrawCheck();
+    autoNFTLoanRequestCheck();
 }

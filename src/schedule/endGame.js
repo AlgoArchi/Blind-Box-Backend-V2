@@ -11,15 +11,15 @@ const parsed = JSON.parse(fs.readFileSync(jsonFile));
 const abi = parsed.abi;
 const contract_router = new web3.eth.Contract(abi, web3.utils.toChecksumAddress(contract_address));
 
-const { averagePrice } = require('~/lib/realTimeBTC.socket');
+const { btcPrice } = require('~/lib/realTimeBTC.socket');
 
 module.exports.endRound = async (roundId) => {
     const batchSize = Number(process.env.ROUND_BET_LIMIT);
 
     try {
-        const expectedGas = await contract_router.methods.endRound(roundId, averagePrice.price, batchSize).estimateGas({ from: process.env.BETTING_GAME_MANAGER_PUBLIC_KEY });
+        const expectedGas = await contract_router.methods.endRound(roundId, btcPrice.price, batchSize).estimateGas({ from: process.env.BETTING_GAME_MANAGER_PUBLIC_KEY });
 
-        const tx = await contract_router.methods.endRound(roundId, averagePrice.price, batchSize);
+        const tx = await contract_router.methods.endRound(roundId, btcPrice.price, batchSize);
 
         const _data = tx.encodeABI();
 
@@ -39,7 +39,7 @@ module.exports.endRound = async (roundId) => {
         const transaction_hash = await token_hash.transactionHash;
         console.log("End transaction_hash ", transaction_hash);
 
-        await Round.update({ status: "ENDED", endPrice: averagePrice.price }, {
+        await Round.update({ status: "ENDED", endPrice: btcPrice.price }, {
             where: { id: roundId }
         });
     } catch (error) {
@@ -48,7 +48,7 @@ module.exports.endRound = async (roundId) => {
             if (transactionHashMatch) {
                 const transaction_hash = transactionHashMatch[1];
                 console.log("End transaction_hash  ===", transaction_hash);
-                await Round.update({ status: "ENDED", endPrice: averagePrice.price }, {
+                await Round.update({ status: "ENDED", endPrice: btcPrice.price }, {
                     where: { id: roundId }
                 });
             } else {

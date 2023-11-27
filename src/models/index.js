@@ -12,6 +12,8 @@ const getWithdrawModel = require('./withdraws');
 const getRoundModel = require('./rounds');
 const getBettingModel = require('./bettings');
 const getAdminModel = require('./admins');
+const getNFTLoansModel = require('./nftLoans');
+const getNFTLoanHistoryModel = require('./nftLoanHistories');
 
 const sequelize = new Sequelize(mysql.db, mysql.username, mysql.password, mysql.options);
 
@@ -25,7 +27,9 @@ const models = {
   Withdraw: getWithdrawModel(sequelize, Sequelize),
   Round: getRoundModel(sequelize, Sequelize),
   Betting: getBettingModel(sequelize, Sequelize),
-  Admin: getAdminModel(sequelize, Sequelize)
+  Admin: getAdminModel(sequelize, Sequelize),
+  NFTLoan: getNFTLoansModel(sequelize, Sequelize),
+  NFTLoanHistory: getNFTLoanHistoryModel(sequelize, Sequelize)
 };
 
 module.exports = { sequelize, ...models };

@@ -11,13 +11,13 @@ const parsed = JSON.parse(fs.readFileSync(jsonFile));
 const abi = parsed.abi;
 const contract_router = new web3.eth.Contract(abi, web3.utils.toChecksumAddress(contract_address));
 
-const { averagePrice } = require('~/lib/realTimeBTC.socket');
+const { btcPrice } = require('~/lib/realTimeBTC.socket');
 
 module.exports.startRound = async (roundId) => {
     try {
-        const expectedGas = await contract_router.methods.startRound(roundId, averagePrice.price).estimateGas({ from: process.env.BETTING_GAME_MANAGER_PUBLIC_KEY });
+        const expectedGas = await contract_router.methods.startRound(roundId, btcPrice.price).estimateGas({ from: process.env.BETTING_GAME_MANAGER_PUBLIC_KEY });
 
-        const tx = await contract_router.methods.startRound(roundId, averagePrice.price);
+        const tx = await contract_router.methods.startRound(roundId, btcPrice.price);
 
         const _data = tx.encodeABI();
 
@@ -37,7 +37,7 @@ module.exports.startRound = async (roundId) => {
         const transaction_hash = await token_hash.transactionHash;
         console.log("Start transaction_hash ", transaction_hash);
 
-        await Round.update({ status: "STARTED", startPrice: averagePrice.price }, {
+        await Round.update({ status: "STARTED", startPrice: btcPrice.price }, {
             where: { id: roundId }
         });
     } catch (error) {
@@ -46,7 +46,7 @@ module.exports.startRound = async (roundId) => {
             if (transactionHashMatch) {
                 const transaction_hash = transactionHashMatch[1];
                 console.log("Start transaction_hash  ===", transaction_hash);
-                await Round.update({ status: "STARTED", startPrice: averagePrice.price }, {
+                await Round.update({ status: "STARTED", startPrice: btcPrice.price }, {
                     where: { id: roundId }
                 });
             } else {
